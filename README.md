@@ -1,1 +1,1 @@
-# Aplikacija-za-vodenje-portnih-aktivnosti-v-podjetju
+# Aplikacija-za-vodenje-sportnih-aktivnosti-v-podjetju
