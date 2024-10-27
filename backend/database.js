@@ -1,0 +1,27 @@
+const sqlite3 = require("sqlite3").verbose();
+
+// Uporabi ime datoteke namesto ":memory:" za trajno shranjevanje
+const db = new sqlite3.Database("./database.sqlite", (err) => {
+    if (err) {
+        console.error("Error opening database:", err.message);
+    } else {
+        db.run(
+            `CREATE TABLE IF NOT EXISTS events (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT,
+                description TEXT,
+                date TEXT,
+                location TEXT
+            )`,
+            (err) => {
+                if (err) {
+                    console.log("Error creating table:", err.message);
+                } else {
+                    console.log("Connected to the SQLite database and table is ready.");
+                }
+            }
+        );
+    }
+});
+
+module.exports = db;
