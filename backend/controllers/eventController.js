@@ -24,3 +24,18 @@ exports.getAllEvents = (req, res) => {
         }
     });
 };
+
+exports.deleteEvent = (req, res) => {
+    const { id } = req.params;
+    db.run(
+        `DELETE FROM events WHERE id = ?`,
+        [id],
+        function (err) {
+            if (err) {
+                res.status(500).json({ error: err.message });
+            } else {
+                res.status(200).json({ message: "Dogodek uspešno izbrisan" });
+            }
+        }
+    );
+};

@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { addEvent } from "../services/api";
+import { addEvent } from "../services/api.tsx";
 
 interface AddEventProps {
     onClose: () => void;
-    onAddEvent: () => void; // Nova callback funkcija
+    onAddEvent: () => void;
 }
 
 const AddEvent = ({ onClose, onAddEvent }: AddEventProps) => {
