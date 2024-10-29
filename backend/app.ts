@@ -1,7 +1,7 @@
-const express = require("express");
-const bodyParser = require("body-parser");
-const eventRoutes = require("./routes/events");
-const cors = require("cors");
+import express from "express";
+import bodyParser from "body-parser";
+import {eventRoutes} from "./routes/events";
+import cors from "cors";
 
 const app = express();
 app.use(bodyParser.json());
