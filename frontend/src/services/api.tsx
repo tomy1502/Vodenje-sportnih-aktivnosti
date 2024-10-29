@@ -42,3 +42,13 @@ export const deleteEvent = async (id: number): Promise<void> => {
         console.error("Napaka pri brisanju dogodka:", error);
     }
 };
+//update
+export const updateEvent = async (id: number, updatedEvent: Omit<Event, "id">): Promise<void> => {
+    try {
+        console.log("Posodabljam dogodek z ID:", id, "s podatki:", updatedEvent);
+        const response = await axios.put<Event>(`${API_URL}/${id}`, updatedEvent);
+        console.log("Odgovor strežnika:", response.data);
+    } catch (error) {
+        console.error("Napaka pri posodabljanju dogodka:", error);
+    }
+};
