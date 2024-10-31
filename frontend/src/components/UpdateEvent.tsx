@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { updateEvent, Event } from "../services/api";
+import { updateEvent, Event, NewEvent } from "../services/api";
+import { eventDateToHtmlInput } from "../modules/functions/eventHelperFunctions";
 
 interface UpdateEventProps {
     onClose: () => void;
@@ -7,13 +8,16 @@ interface UpdateEventProps {
     eventToEdit: Event; // Dogodek, ki ga urejamo
 }
 
+const emptyEvent: NewEvent = {
+    name: "",
+    description: "",
+    date: "",
+    location: "",
+    organizer: ""
+}
+
 const UpdateEvent = ({ onClose, onUpdateEvent, eventToEdit }: UpdateEventProps) => {
-    const [event, setEvent] = useState({
-        name: "",
-        description: "",
-        date: "",
-        location: "",
-    });
+    const [event, setEvent] = useState(emptyEvent);
 
     // Inicializiraj obrazec s podatki dogodka za urejanje
     useEffect(() => {
@@ -23,6 +27,7 @@ const UpdateEvent = ({ onClose, onUpdateEvent, eventToEdit }: UpdateEventProps) 
                 description: eventToEdit.description,
                 date: eventToEdit.date,
                 location: eventToEdit.location,
+                organizer: eventToEdit.organizer
             });
         }
     }, [eventToEdit]);
@@ -37,11 +42,12 @@ const UpdateEvent = ({ onClose, onUpdateEvent, eventToEdit }: UpdateEventProps) 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         console.log("Posodabljam dogodek:", eventToEdit.id, event); // Dodan log
-        await updateEvent(eventToEdit.id, event);
+        const date = new Date(event.date);
+        const savedEvent: NewEvent = {...event, date: date.toISOString()};
+        await updateEvent(eventToEdit.id, savedEvent);
         onUpdateEvent();
         onClose();
     };
-
 
     return (
         <form onSubmit={handleSubmit}>
@@ -72,9 +78,9 @@ const UpdateEvent = ({ onClose, onUpdateEvent, eventToEdit }: UpdateEventProps) 
             <div className="form-group">
                 <label htmlFor="date">Datum</label>
                 <input
-                    type="date"
+                    type="datetime-local"
                     name="date"
-                    value={event.date}
+                    value={eventDateToHtmlInput(event.date)}
                     onChange={handleChange}
                     className="form-control"
                     required

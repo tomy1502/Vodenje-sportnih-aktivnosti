@@ -1,18 +1,25 @@
 import { useState } from "react";
-import { addEvent } from "../services/api.tsx";
+import { addEvent, NewEvent } from "../services/api.tsx";
+import { signedInUserAtom } from "../atoms/signedInUserAtom.ts";
+import { useAtom } from "jotai";
+import { UserRole } from "../services/usersApi.ts";
 
 interface AddEventProps {
     onClose: () => void;
     onAddEvent: () => void;
 }
 
+const emptyEvent: NewEvent = {
+    name: "",
+    description: "",
+    date: "",
+    location: "",
+    organizer: ""
+}
+
 const AddEvent = ({ onClose, onAddEvent }: AddEventProps) => {
-    const [event, setEvent] = useState({
-        name: "",
-        description: "",
-        date: "",
-        location: "",
-    });
+    const [signedInUser] = useAtom(signedInUserAtom);
+    const [event, setEvent] = useState(emptyEvent);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         setEvent({
@@ -23,8 +30,16 @@ const AddEvent = ({ onClose, onAddEvent }: AddEventProps) => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        await addEvent(event);
-        setEvent({ name: "", description: "", date: "", location: "" });
+
+        if(!signedInUser || signedInUser.role!==UserRole.MANAGEMENT) {
+            console.error("Unauthorized. To add event, you have to be logged in as management.")
+            return;
+        }
+
+        const date = new Date(event.date);
+        const savedEvent: NewEvent = {...event, date: date.toISOString(), organizer: signedInUser.fullName};
+        await addEvent(savedEvent);
+        setEvent(emptyEvent);
         onAddEvent();
         onClose();
     };
@@ -58,7 +73,7 @@ const AddEvent = ({ onClose, onAddEvent }: AddEventProps) => {
             <div className="form-group">
                 <label htmlFor="date">Datum</label>
                 <input
-                    type="date"
+                    type="datetime-local"
                     name="date"
                     value={event.date}
                     onChange={handleChange}

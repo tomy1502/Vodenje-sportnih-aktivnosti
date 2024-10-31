@@ -11,7 +11,8 @@ const db = new sqlite3.Database("./database.sqlite", (err) => {
                 name TEXT,
                 description TEXT,
                 date TEXT,
-                location TEXT
+                location TEXT,
+                organizer TEXT
             );
             
             CREATE TABLE IF NOT EXISTS users (
