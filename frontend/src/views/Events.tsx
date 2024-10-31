@@ -4,8 +4,12 @@ import AddEvent from "../components/AddEvent";
 import UpdateEvent from "../components/UpdateEvent";
 import { Modal, Button } from "react-bootstrap";
 import { FaTrashAlt, FaEdit } from "react-icons/fa";
+import { signedInUserAtom } from "../atoms/signedInUserAtom";
+import { useAtom } from "jotai";
+import { UserRole } from "../services/usersApi";
 
 const Events = () => {
+    const [signedInUser] = useAtom(signedInUserAtom);
     const [events, setEvents] = useState<Event[]>([]);
     const [showModal, setShowModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -61,16 +65,20 @@ const Events = () => {
                 {events.map((event) => (
                     <div key={event.id} className="col">
                         <div className="card h-100 shadow-sm position-relative">
-                            <FaEdit
-                                className="position-absolute text-primary"
-                                style={{ top: "10px", right: "40px", cursor: "pointer" }}
-                                onClick={() => handleEditModalShow(event)}
-                            />
-                            <FaTrashAlt
-                                className="position-absolute text-danger"
-                                style={{ top: "10px", right: "10px", cursor: "pointer" }}
-                                onClick={() => handleDeleteModalShow(event.id)}
-                            />
+                            {signedInUser && signedInUser.role==UserRole.MANAGEMENT &&
+                                <>
+                                    <FaEdit
+                                        className="position-absolute text-primary"
+                                        style={{ top: "10px", right: "40px", cursor: "pointer" }}
+                                        onClick={() => handleEditModalShow(event)}
+                                    />
+                                    <FaTrashAlt
+                                        className="position-absolute text-danger"
+                                        style={{ top: "10px", right: "10px", cursor: "pointer" }}
+                                        onClick={() => handleDeleteModalShow(event.id)}
+                                    />
+                                </>
+                            }
                             <div className="card-body">
                                 <h5 className="card-title">{event.name}</h5>
                                 <h6 className="card-subtitle mb-2 text-muted">{event.date}</h6>
@@ -82,11 +90,13 @@ const Events = () => {
                 ))}
             </div>
 
-            <div className="text-center mt-4">
-                <Button variant="primary" onClick={handleModalShow}>
-                    Dodaj Dogodek
-                </Button>
-            </div>
+            {signedInUser && signedInUser.role==UserRole.MANAGEMENT &&
+                <div className="text-center mt-4">
+                    <Button variant="primary" onClick={handleModalShow}>
+                        Dodaj Dogodek
+                    </Button>
+                </div>
+            }
 
             <Modal show={showEditModal} onHide={handleEditModalClose}>
                 <Modal.Header closeButton>
