@@ -64,6 +64,6 @@ export const loginUser = async (username: string, password: string): Promise<Use
             
         return undefined;
     } catch (error) {
-        console.error("Napaka pri dodajanju uporabnika:", error);
+        console.error("Napaka pri prijavi uporabnika:", error);
     }
 };

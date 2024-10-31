@@ -3,19 +3,16 @@ import { API_URL } from "./apiConstants";
 
 const eventsUrl = API_URL+"/events";
 
-export interface Event {
-    id: number;
-    name: string;
-    description: string;
-    date: string;
-    location: string;
-}
-
 export interface NewEvent {
     name: string;
     description: string;
     date: string;
     location: string;
+    organizer: string;
+}
+
+export interface Event extends NewEvent {
+    id: number;
 }
 
 export const addEvent = async (event: NewEvent): Promise<Event | undefined> => {

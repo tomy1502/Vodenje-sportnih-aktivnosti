@@ -1,10 +1,10 @@
 const db = require("../database");
 
 exports.addEvent = (req, res) => {
-    const { name, description, date, location } = req.body;
+    const { name, description, date, location, organizer } = req.body;
     db.run(
-        `INSERT INTO events (name, description, date, location) VALUES (?, ?, ?, ?)`,
-        [name, description, date, location],
+        `INSERT INTO events (name, description, date, location, organizer) VALUES (?, ?, ?, ?, ?)`,
+        [name, description, date, location, organizer],
         function (err) {
             if (err) {
                 res.status(500).json({ error: err.message });
@@ -43,11 +43,11 @@ exports.deleteEvent = (req, res) => {
 
 exports.updateEvent = (req, res) => {
     const { id } = req.params;
-    const { name, description, date, location } = req.body;
+    const { name, description, date, location, organizer } = req.body;
 
     db.run(
-        `UPDATE events SET name = ?, description = ?, date = ?, location = ? WHERE id = ?`,
-        [name, description, date, location, id],
+        `UPDATE events SET name = ?, description = ?, date = ?, location = ?, organizer = ? WHERE id = ?`,
+        [name, description, date, location, organizer, id],
         function (err) {
             if (err) {
                 return res.status(500).json({ error: err.message }); // Napaka pri posodobitvi
