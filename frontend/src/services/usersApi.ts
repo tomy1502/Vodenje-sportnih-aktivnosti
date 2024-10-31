@@ -3,7 +3,7 @@ import { API_URL } from "./apiConstants";
 
 const usersUrl = API_URL+"/users";
 
-export enum userRole {
+export enum UserRole {
     MANAGEMENT = "management",
     EMPLOYEE = "employee",
     UNASSIGNED = "unassigned"
@@ -13,7 +13,7 @@ export interface User {
     username: string, 
     password: string, 
     fullName: string, 
-    role: userRole
+    role: UserRole
 }
 
 export interface UserWithId extends User {
@@ -46,12 +46,24 @@ export const deleteUser = async (id: number): Promise<void> => {
     }
 };
 
-export const updateUser = async (id: number, updatedEvent: Omit<UserWithId, "id">): Promise<void> => {
+export const updateUser = async (id: number, user: User): Promise<void> => {
     try {
-        console.log("Posodabljam uporabnika z ID:", id, "s podatki:", updatedEvent);
-        const response = await axios.put<UserWithId>(`${usersUrl}/${id}`, updatedEvent);
+        console.log("Posodabljam uporabnika z ID:", id, "s podatki:", user);
+        const response = await axios.put<UserWithId>(`${usersUrl}/${id}`, user);
         console.log("Odgovor strežnika:", response.data);
     } catch (error) {
         console.error("Napaka pri posodabljanju uporabnika:", error);
+    }
+};
+
+export const loginUser = async (username: string, password: string): Promise<UserWithId | undefined> => {
+    try {
+        const response = await axios.post<UserWithId>(`${usersUrl}/login`, {username: username, password: password});
+        if(response.status === 200)
+            return response.data;
+            
+        return undefined;
+    } catch (error) {
+        console.error("Napaka pri dodajanju uporabnika:", error);
     }
 };

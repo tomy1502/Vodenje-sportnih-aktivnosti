@@ -6,7 +6,7 @@ import { Modal, Button } from "react-bootstrap";
 import { FaTrashAlt, FaEdit } from "react-icons/fa";
 import { signedInUserAtom } from "../atoms/signedInUserAtom";
 import { useAtom } from "jotai";
-import { userRole } from "../services/usersApi";
+import { UserRole } from "../services/usersApi";
 
 const Events = () => {
     const [signedInUser] = useAtom(signedInUserAtom);
@@ -65,7 +65,7 @@ const Events = () => {
                 {events.map((event) => (
                     <div key={event.id} className="col">
                         <div className="card h-100 shadow-sm position-relative">
-                            {signedInUser && signedInUser.role==userRole.MANAGEMENT &&
+                            {signedInUser && signedInUser.role==UserRole.MANAGEMENT &&
                                 <>
                                     <FaEdit
                                         className="position-absolute text-primary"
@@ -90,7 +90,7 @@ const Events = () => {
                 ))}
             </div>
 
-            {signedInUser && signedInUser.role==userRole.MANAGEMENT &&
+            {signedInUser && signedInUser.role==UserRole.MANAGEMENT &&
                 <div className="text-center mt-4">
                     <Button variant="primary" onClick={handleModalShow}>
                         Dodaj Dogodek

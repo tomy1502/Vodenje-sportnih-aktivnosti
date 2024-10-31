@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useAtom } from "jotai";
 import { Button, Form } from "react-bootstrap";
-import { getAllUsers } from "../../../services/usersApi";
+import { loginUser } from "../../../services/usersApi";
 import { signedInUserAtom } from "../../../atoms/signedInUserAtom";
 
 export default function Login() {
@@ -13,20 +13,13 @@ export default function Login() {
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        const users = await getAllUsers();
-        if(!users) {
-            setError("Invalid username or password.");
-            return;
-        }
-
-        const user = users.find((user) => (user.username==username && user.password==password));
+        const user = await loginUser(username, password);
         if(!user) {
-            setError("Invalid username or password.");
+            setError("Napačno uporabniško ime ali geslo.");
             return;
         }
 
         setSignedInUser(user);
-        alert("Login successful!");
     };
 
     return (

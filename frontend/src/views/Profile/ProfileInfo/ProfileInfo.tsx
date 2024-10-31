@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
-import { UserWithId, getAllUsers, updateUser, userRole } from '../../../services/usersApi'; // Adjust the import path
+import { UserWithId, getAllUsers, updateUser, UserRole } from '../../../services/usersApi'; // Adjust the import path
 import { Modal, Button, Form } from 'react-bootstrap';
 import { signedInUserAtom } from '../../../atoms/signedInUserAtom';
 import { useAtom } from 'jotai';
+import { userRoleToSlovenian } from '../../../modules/functions/userRoleTranslation';
 
 export default function ProfileInfo() {
     const [user, setUser] = useState<UserWithId | null>(null);
@@ -47,13 +48,13 @@ export default function ProfileInfo() {
 
     return (
         <div className="container mt-4">
-            <h2 className="mb-4">Profil Uporabnika</h2>
+            <h2 className="mb-4">Profil</h2>
             {user ? (
                 <div className="card shadow-sm">
                     <div className="card-body">
                         <h5 className="card-title">{user.fullName}</h5>
-                        <h6 className="card-subtitle mb-2 text-muted">{user.username}</h6>
-                        <p className="card-text"><strong>Role:</strong> {user.role}</p>
+                        <h6 className="card-subtitle mb-2 text-muted" style={{marginTop: "1em"}}><strong>Uporabniško ime:</strong> {user.username}</h6>
+                        <p className="card-text"><strong>Role:</strong> {userRoleToSlovenian(user.role)}</p>
                         <Button variant="primary" onClick={handleEditModalShow}>
                             Uredi Profil
                         </Button>
@@ -102,11 +103,11 @@ export default function ProfileInfo() {
                                 <Form.Control
                                     as="select"
                                     value={updatedUser.role}
-                                    onChange={(e) => setUpdatedUser({ ...updatedUser, role: e.target.value as userRole })}
+                                    onChange={(e) => setUpdatedUser({ ...updatedUser, role: e.target.value as UserRole })}
                                 >
-                                    <option value="management">Management</option>
-                                    <option value="employee">Employee</option>
-                                    <option value="unassigned">Unassigned</option>
+                                    <option value={UserRole.MANAGEMENT}>{userRoleToSlovenian(UserRole.MANAGEMENT)}</option>
+                                    <option value={UserRole.EMPLOYEE}>{userRoleToSlovenian(UserRole.EMPLOYEE)}</option>
+                                    <option value={UserRole.UNASSIGNED}>{userRoleToSlovenian(UserRole.UNASSIGNED)}</option>
                                 </Form.Control>
                             </Form.Group>
                         </Form>

@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import { Button, Form } from "react-bootstrap";
-import { addUser, User, userRole } from "../../../services/usersApi";
+import { addUser, User, UserRole } from "../../../services/usersApi";
+import { userRoleToSlovenian } from "../../../modules/functions/userRoleTranslation";
 
 const defaultForm = {
     username: "",
     password: "",
     fullName: "",
-    role: userRole.UNASSIGNED
+    role: UserRole.UNASSIGNED
 };
 
 export default function Register() {
@@ -21,12 +22,12 @@ export default function Register() {
         e.preventDefault();
         try {
             await addUser(formData);
-            alert("Registration successful!");
+            alert("Registracija uspešna.\nSedaj se lahko prijavite.");
             setFormData(defaultForm)
 
         } catch (error) {
             console.error("Error during registration:", error);
-            alert("Registration failed. Please try again.");
+            alert("Registracija neuspešna. Poskusite ponovno");
         }
     };
 
@@ -75,9 +76,9 @@ export default function Register() {
                         value={formData.role}
                         onChange={handleChange}
                     >
-                        <option value="management">Vodstvo</option>
-                        <option value="employee">Zaposleni</option>
-                        <option value="unassigned">Nedodeljen</option>
+                        <option value={UserRole.MANAGEMENT}>{userRoleToSlovenian(UserRole.MANAGEMENT)}</option>
+                        <option value={UserRole.EMPLOYEE}>{userRoleToSlovenian(UserRole.EMPLOYEE)}</option>
+                        <option value={UserRole.UNASSIGNED}>{userRoleToSlovenian(UserRole.UNASSIGNED)}</option>
                     </Form.Control>
                 </Form.Group>
 

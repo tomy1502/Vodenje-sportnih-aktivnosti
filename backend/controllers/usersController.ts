@@ -59,5 +59,19 @@ export const usersController = {
                 res.status(200).json({ message: 'Uporabnik posodobljen!', id }); // Uspešna posodobitev
             }
         );
-    }
+    },
+
+    login: (req: Request, res: Response) => {
+        const { username, password } = req.body;
+        db.all("SELECT * FROM users WHERE username=? AND password=? LIMIT 1", [username, password], (err, rows) => {
+            if (err) {
+                res.status(500).json({ error: err.message });
+            } else {
+                if(!rows[0])
+                    res.status(400).json({ error: "Wrong credentials" });
+
+                res.status(200).json(rows[0]);
+            }
+        });
+    },
 };
