@@ -8,6 +8,10 @@ router.get("/", eventController.getAllEvents);
 router.delete("/:id", eventController.deleteEvent);
 router.put("/:id", eventController.updateEvent);
 
+router.post('/register', eventController.registerForEvent); //za prijavoNaDogodek
+router.post('/deregister/:eventId', eventController.deregisterFromEvent);
+
+
 export {router as eventRoutes};
 
 //module.exports = router;

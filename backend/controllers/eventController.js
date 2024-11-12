@@ -59,3 +59,44 @@ exports.updateEvent = (req, res) => {
         }
     );
 };
+
+
+// controllers/events.js za dodajanje in odstranjevanje prijav na event
+exports.registerForEvent = (req, res) => {
+    const { eventId, userId } = req.body;
+
+    console.log('Received eventId:', eventId); // Verify if this logs
+    console.log('Received userId:', userId);   // Verify if this logs
+
+    db.run(
+        `INSERT INTO Registrations (event_id, user_id) VALUES (?, ?)`,
+        [eventId, userId],
+        function (err) {
+            if (err) {
+                console.error("Database error:", err.message);
+                return res.status(500).json({ error: "Error during registration: " + err.message });
+            }
+            res.status(201).json({ message: 'Prijava uspešna', id: this.lastID });
+        }
+    );
+};
+
+exports.deregisterFromEvent = (req, res) => {
+    const { eventId } = req.params;  // We expect eventId in the URL parameter
+    const { userId } = req.body;     // userId should come from the request body
+
+    // SQL query to delete the registration
+    db.run(
+        `DELETE FROM Registrations WHERE event_id = ? AND user_id = ?`,
+        [eventId, userId],
+        function (err) {
+            if (err) {
+                return res.status(500).json({ error: err.message });
+            }
+            // Respond with success message
+            res.json({ message: 'Odjava uspešna' });
+        }
+    );
+};
+
+
