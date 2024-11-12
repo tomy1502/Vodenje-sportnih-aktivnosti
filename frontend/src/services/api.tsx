@@ -15,6 +15,10 @@ export interface Event extends NewEvent {
     id: number;
 }
 
+export interface User {
+    id: number;
+}
+
 export const addEvent = async (event: NewEvent): Promise<Event | undefined> => {
     try {
         const response = await axios.post<Event>(eventsUrl, event);
@@ -48,5 +52,38 @@ export const updateEvent = async (id: number, updatedEvent: Omit<Event, "id">): 
         console.log("Odgovor strežnika:", response.data);
     } catch (error) {
         console.error("Napaka pri posodabljanju dogodka:", error);
+    }
+};
+
+// Prijava na dogodek
+export const registerForEvent = async (eventId: number, userId: number): Promise<void> => {
+    try {
+        const response = await axios.post(`${API_URL}/events/register`, { eventId, userId });
+        console.log("Registration successful:", response.data);
+    } catch (error) {
+        if (axios.isAxiosError(error)) {
+            // Check if error.response exists to handle HTTP response errors
+            if (error.response) {
+                console.error("Error registering for event:", error.response.data);
+            } else if (error.request) {
+                // This case happens if the request was made but no response was received
+                console.error("No response received:", error.request);
+            } else {
+                // If it's some other error (e.g., setup error)
+                console.error("Error setting up request:", error.message);
+            }
+        } else {
+            // For any non-axios errors (e.g., unexpected JavaScript errors)
+            console.error("Unexpected error:", error);
+        }
+    }
+};
+
+export const deregisterFromEvent = async (eventId: number, userId: number): Promise<void> => {
+    try {
+        const response = await axios.post(`${eventsUrl}/deregister/${eventId}`, { userId });
+        console.log("Odjava iz dogodka uspešna:", response.data);
+    } catch (error) {
+        console.error("Napaka pri odjavi iz dogodka:", error);
     }
 };
