@@ -62,18 +62,14 @@ export const registerForEvent = async (eventId: number, userId: number): Promise
         console.log("Registration successful:", response.data);
     } catch (error) {
         if (axios.isAxiosError(error)) {
-            // Check if error.response exists to handle HTTP response errors
             if (error.response) {
                 console.error("Error registering for event:", error.response.data);
             } else if (error.request) {
-                // This case happens if the request was made but no response was received
                 console.error("No response received:", error.request);
             } else {
-                // If it's some other error (e.g., setup error)
                 console.error("Error setting up request:", error.message);
             }
         } else {
-            // For any non-axios errors (e.g., unexpected JavaScript errors)
             console.error("Unexpected error:", error);
         }
     }
@@ -85,5 +81,19 @@ export const deregisterFromEvent = async (eventId: number, userId: number): Prom
         console.log("Odjava iz dogodka uspešna:", response.data);
     } catch (error) {
         console.error("Napaka pri odjavi iz dogodka:", error);
+    }
+};
+
+
+// Funkcija za pridobivanje obvestil uporabnika
+export const getUserNotifications = async (userId: number): Promise<string[] | undefined> => {
+    try {
+        const response = await axios.get<string[]>(`${API_URL}/events/notifications/${userId}`);
+        // Vrnemo seznam obvestil
+        console.log("opravljen apiklic")
+        return response.data;
+    } catch (error) {
+        console.error("Napaka pri pridobivanju obvestil:", error);
+        return undefined;  // Če pride do napake, vrnemo undefined
     }
 };

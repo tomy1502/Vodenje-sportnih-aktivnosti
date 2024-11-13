@@ -53,6 +53,23 @@ const db = new sqlite3.Database("./database.sqlite", (err) => {
             }
         });
 
+        // Create the 'notifications' table
+        db.run(`
+            CREATE TABLE IF NOT EXISTS notifications (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER,
+                message TEXT,
+                FOREIGN KEY (user_id) REFERENCES users(id)
+            );
+        `, (err) => {
+            if (err) {
+                console.log("Error creating 'notifications' table:", err.message);
+            } else {
+                console.log("'notifications' table created or already exists.");
+            }
+        });
+
+
     }
 });
 
