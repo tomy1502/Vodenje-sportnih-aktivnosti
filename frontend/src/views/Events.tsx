@@ -1,8 +1,15 @@
 import { useEffect, useState } from "react";
-import { getAllEvents, deleteEvent, Event, registerForEvent, deregisterFromEvent } from "../services/api";
+import {
+    getAllEvents,
+    deleteEvent,
+    Event,
+    registerForEvent,
+    deregisterFromEvent,
+    getUserNotifications
+} from "../services/api";
 import AddEvent from "../components/AddEvent";
 import UpdateEvent from "../components/UpdateEvent";
-import { Modal, Button } from "react-bootstrap";
+import { Modal, Button, Alert } from "react-bootstrap";
 import { FaTrashAlt, FaEdit, FaInfoCircle, FaUserPlus, FaUserMinus } from "react-icons/fa";
 import { signedInUserAtom } from "../atoms/signedInUserAtom";
 import { useAtom } from "jotai";
@@ -23,6 +30,7 @@ const Events = () => {
     const [showDetailsModal, setShowDetailsModal] = useState(false);
     const [eventToShowDetails, setEventToShowDetails] = useState<Event | null>(null);
     const [registeredEvents, setRegisteredEvents] = useState<number[]>([]);
+    const [latestNotification, setLatestNotification] = useState<string | null>(null);
 
     const handleFilterUpdate = (filter: EventFilterObject) => {
         const filtered = events.filter((event) => {
@@ -55,6 +63,40 @@ const Events = () => {
         fetchEvents();
     }, []);
 
+    // Fetch latest notification for user
+    useEffect(() => {
+        const fetchNotifications = async () => {
+            if (signedInUser) {
+                const userNotifications = await getUserNotifications(signedInUser.id);
+                if (userNotifications && userNotifications.length > 0) {
+                    const latest = userNotifications[userNotifications.length - 1];
+
+                    // Check if this is a new notification
+                    const lastSeenNotification = localStorage.getItem(`lastSeenNotification_${signedInUser.id}`);
+                    if (lastSeenNotification !== latest) {
+                        setLatestNotification(latest); // Display the new notification
+                        localStorage.setItem(`lastSeenNotification_${signedInUser.id}`, latest); // Store as last seen
+                    }
+                }
+            }
+        };
+
+        fetchNotifications();
+    }, [signedInUser]);
+
+// Auto-remove notification after a few seconds
+    useEffect(() => {
+        if (latestNotification) {
+            const timer = setTimeout(() => {
+                setLatestNotification(null);
+            }, 3000);
+
+            return () => clearTimeout(timer);
+        }
+    }, [latestNotification]);
+
+
+
     useEffect(() => {
         if (signedInUser) {
             const fetchRegisteredEvents = async () => {
@@ -68,7 +110,6 @@ const Events = () => {
     }, [signedInUser]);
 
     const fetchRegisteredForUser = async (userId: number) => {
-        // Fetch the list of events the user is registered for from the backend or localStorage
         const registeredFromStorage = JSON.parse(localStorage.getItem(`registeredEvents_${userId}`) || "[]");
         return registeredFromStorage;
     };
@@ -149,6 +190,13 @@ const Events = () => {
     return (
         <div className="container mt-4">
             <h2 className="mb-4">Seznam dogodkov</h2>
+            {/* Render notifications */}
+            {/* Display Latest Notification */}
+            {latestNotification && (
+                <Alert variant="info" className="mb-3">
+                    {latestNotification}
+                </Alert>
+            )}
             <EventFilter onFilterUpdate={handleFilterUpdate} />
             <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
                 {filteredEvents.map((event) => (
