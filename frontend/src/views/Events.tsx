@@ -7,12 +7,14 @@ import { FaTrashAlt, FaEdit, FaInfoCircle, FaUserPlus, FaUserMinus } from "react
 import { signedInUserAtom } from "../atoms/signedInUserAtom";
 import { useAtom } from "jotai";
 import { UserRole } from "../services/usersApi";
-import { eventDateToSlovenian } from "../modules/functions/eventHelperFunctions";
+import { eventDateToSlovenian, parseEventDate } from "../modules/functions/eventHelperFunctions";
 import EventDetails from "../components/EventDetails";
+import EventFilter, { EventFilterObject } from "./Events/EventFilter/EventFilter";
 
 const Events = () => {
     const [signedInUser] = useAtom(signedInUserAtom);
     const [events, setEvents] = useState<Event[]>([]);
+    const [filteredEvents, setFilteredEvents] = useState<Event[]>([]);
     const [showModal, setShowModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [selectedEventId, setSelectedEventId] = useState<number | null>(null);
@@ -22,9 +24,31 @@ const Events = () => {
     const [eventToShowDetails, setEventToShowDetails] = useState<Event | null>(null);
     const [registeredEvents, setRegisteredEvents] = useState<number[]>([]);
 
+    const handleFilterUpdate = (filter: EventFilterObject) => {
+        const filtered = events.filter((event) => {
+            const matchesText =
+                filter.text==="" ||
+                event.name.toLowerCase().includes(filter.text.toLowerCase()) ||
+                event.description.toLowerCase().includes(filter.text.toLowerCase());
+
+            const date = parseEventDate(filter.date);
+            date.setDate(date.getDate()+1);
+            const matchesDate = filter.date==="" || date>=parseEventDate(event.date);
+
+            const matchesLocation =
+                filter.location === "" ||
+                event.location.toLowerCase().includes(filter.location.toLowerCase());
+
+            return matchesText && matchesDate && matchesLocation;
+        });
+        
+        setFilteredEvents(filtered);
+    };
+
     const fetchEvents = async () => {
         const data = await getAllEvents();
         setEvents(data ?? []);
+        setFilteredEvents(data ?? []);
     };
 
     useEffect(() => {
@@ -124,14 +148,15 @@ const Events = () => {
 
     return (
         <div className="container mt-4">
-            <h2 className="mb-4">Seznam Dogodkov</h2>
+            <h2 className="mb-4">Seznam dogodkov</h2>
+            <EventFilter onFilterUpdate={handleFilterUpdate} />
             <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-                {events.map((event) => (
+                {filteredEvents.map((event) => (
                     <div key={event.id} className="col">
                         <div className="card h-100 shadow-sm position-relative">
                             <FaInfoCircle
                                 className="position-absolute text-primary"
-                                style={{ top: "10px", right: (signedInUser && signedInUser.role == UserRole.MANAGEMENT ? "110px" : "10px"), cursor: "pointer" }}
+                                style={{ top: "10px", right: "10px", cursor: "pointer" }}
                                 onClick={() => handleDetailsModalShow(event)}
                             />
 
@@ -139,24 +164,24 @@ const Events = () => {
                                 <>
                                     <FaEdit
                                         className="position-absolute text-secondary"
-                                        style={{ top: "10px", right: "80px", cursor: "pointer" }}
+                                        style={{ top: "10px", right: "85px", cursor: "pointer" }}
                                         onClick={() => handleEditModalShow(event)}
                                     />
                                     <FaTrashAlt
                                         className="position-absolute text-danger"
-                                        style={{ top: "10px", right: "50px", cursor: "pointer" }}
+                                        style={{ top: "10px", right: "60px", cursor: "pointer" }}
                                         onClick={() => handleDeleteModalShow(event.id)}
                                     />
                                 </>
                             }
 
-                            {signedInUser && (
+                            {signedInUser && (signedInUser.role==UserRole.EMPLOYEE || signedInUser.role==UserRole.MANAGEMENT) && (
                                 registeredEvents.includes(event.id) ? (
                                     <FaUserMinus
                                         className="position-absolute text-warning"
                                         style={{
                                             top: "10px",
-                                            right: signedInUser.role !== UserRole.MANAGEMENT ? "30px" : "20px", // Adjust for normal users
+                                            right: "35px",
                                             cursor: "pointer"
                                         }}
                                         onClick={() => handleDeregister(event.id)}
@@ -167,7 +192,7 @@ const Events = () => {
                                         className="position-absolute text-success"
                                         style={{
                                             top: "10px",
-                                            right: signedInUser.role !== UserRole.MANAGEMENT ? "30px" : "20px", // Adjust for normal users
+                                            right: "35px",
                                             cursor: "pointer"
                                         }}
                                         onClick={() => handleRegister(event.id)}

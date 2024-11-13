@@ -11,13 +11,12 @@ const db = new sqlite3.Database("./database.sqlite", (err) => {
                 name TEXT,
                 description TEXT,
                 date TEXT,
-                location TEXT
+                location TEXT,
+                organizer TEXT
             );
         `, (err) => {
             if (err) {
                 console.log("Error creating 'events' table:", err.message);
-            } else {
-                console.log("'events' table created or already exists.");
             }
         });
 
@@ -25,14 +24,14 @@ const db = new sqlite3.Database("./database.sqlite", (err) => {
         db.run(`
             CREATE TABLE IF NOT EXISTS users (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
+                username TEXT,
+                password TEXT,
                 fullName TEXT,
                 role TEXT
             );
         `, (err) => {
             if (err) {
                 console.log("Error creating 'users' table:", err.message);
-            } else {
-                console.log("'users' table created or already exists.");
             }
         });
 
@@ -48,8 +47,6 @@ const db = new sqlite3.Database("./database.sqlite", (err) => {
         `, (err) => {
             if (err) {
                 console.log("Error creating 'Registrations' table:", err.message);
-            } else {
-                console.log("'Registrations' table created or already exists.");
             }
         });
 
