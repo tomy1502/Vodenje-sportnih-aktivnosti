@@ -132,6 +132,9 @@ exports.deregisterFromEvent = (req, res) => {
     const { eventId } = req.params;  // We expect eventId in the URL parameter
     const { userId } = req.body;     // userId should come from the request body
 
+    if (!eventId || !userId) {
+        return res.status(400).json({ error: "Missing eventId or userId" });
+    }
     // SQL query to delete the registration
     db.run(
         `DELETE FROM Registrations WHERE event_id = ? AND user_id = ?`,
