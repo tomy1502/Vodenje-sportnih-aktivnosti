@@ -62,7 +62,6 @@ const db = new sqlite3.Database("./database.sqlite", (err) => {
             if (err) {
                 console.log("Error creating 'notifications' table:", err.message);
             } else {
-                console.log("'notifications' table created or already exists.");
             }
         });
 
