@@ -11,6 +11,44 @@ on:
       - main
 
 jobs:
+  # Gradnja frontenda
+  build-frontend:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code  # Kloniranje repozitorija
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js  # Namestitev Node.js okolja
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+
+      - name: Cache node_modules  # Caching odvisnosti
+        uses: actions/cache@v3
+        with:
+          path: frontend/node_modules  # Posodobljena pot do mape node_modules
+          key: ${{ runner.os }}-frontend-${{ hashFiles('frontend/package-lock.json') }}  # Ključ za cache
+          restore-keys: |
+            ${{ runner.os }}-frontend-
+
+      - name: Install dependencies  # Namestitev odvisnosti
+        run: |
+          cd frontend  
+          npm ci
+
+      - name: Build application  # Gradnja aplikacije
+        run: |
+          cd frontend  
+          npm run build
+
+      - name: Upload build artifacts  # Naložitev gradnje kot artefakte
+        uses: actions/upload-artifact@v3
+        with:
+          name: frontend-build
+          path: frontend/build/  # Posodobljena pot za artefakte
+
+
   test-frontend:
     runs-on: ubuntu-latest  # Okolje, v katerem bo job tekel
 
