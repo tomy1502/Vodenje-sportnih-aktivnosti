@@ -8,6 +8,7 @@ import { signedInUserAtom } from "./atoms/signedInUserAtom";
 import { UserRole } from "./services/usersApi";
 import AttachmentPage from "./views/AttachmentPage";
 
+
 const App = () => {
     const [signedInUser] = useAtom(signedInUserAtom); // Get the currently signed-in user
 
