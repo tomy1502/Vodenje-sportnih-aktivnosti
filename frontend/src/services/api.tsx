@@ -19,6 +19,12 @@ export interface User {
     id: number;
 }
 
+export interface AttachmentData {
+    eventId: number;
+    file: File;
+    description: string;
+}
+
 export const addEvent = async (event: NewEvent): Promise<Event | undefined> => {
     try {
         const response = await axios.post<Event>(eventsUrl, event);
@@ -95,5 +101,25 @@ export const getUserNotifications = async (userId: number): Promise<string[] | u
     } catch (error) {
         console.error("Napaka pri pridobivanju obvestil:", error);
         return undefined;  // Če pride do napake, vrnemo undefined
+    }
+};
+
+
+//dodana funckionalnost:
+export const uploadAttachment = async (data: AttachmentData): Promise<void> => {
+    const formData = new FormData();
+    formData.append("eventId", String(data.eventId));
+    formData.append("file", data.file);
+    formData.append("description", data.description);
+
+    try {
+        const response = await axios.post(`${API_URL}/attachments/add`, formData, {
+            headers: { "Content-Type": "multipart/form-data" },
+        });
+        console.log("Attachment uploaded successfully:", response.data);
+        return response.data;
+    } catch (error) {
+        console.error("Error uploading attachment:", error);
+        throw error;
     }
 };

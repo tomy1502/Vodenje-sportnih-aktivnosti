@@ -1,5 +1,7 @@
 const db = require("./database");
 const eventsController = require("./controllers/eventController");
+const attachmentController = require("./controllers/attachmentController");
+
 
 jest.mock("./database");
 //GET
@@ -305,4 +307,119 @@ test("deregisterFromEvent - should handle missing parameters", () => {
     expect(res.status).toHaveBeenCalledWith(400); // Expect HTTP 400 for bad request
     expect(res.json).toHaveBeenCalledWith({ error: "Missing eventId or userId" }); // Adjust the error message to your implementation
 });
+
+
+//Testi za nalogo 3->
+//test 1
+test("addAttachment - should add an attachment successfully", () => {
+    const req = {
+        body: {
+            eventId: 1,
+            description: "Meeting notes",
+        },
+        file: {
+            originalname: "testFile.txt", // Simulated file name
+        },
+    };
+
+    const res = {
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn(),
+    };
+
+    // Mock the database behavior
+    db.run.mockImplementation((query, params, callback) => {
+        callback.call({ lastID: 5 }, null); // Simulate successful insertion
+    });
+
+    const attachmentController = require("./controllers/attachmentController");
+    attachmentController.addAttachment(req, res);
+
+    // Assertions
+    expect(res.status).toHaveBeenCalledWith(201); // Expect HTTP 201 for created
+    expect(res.json).toHaveBeenCalledWith({
+        message: "Priloga uspešno dodana!",
+        attachmentId: 5,
+    });
+});
+
+
+//test 2
+test("addAttachment - should handle missing fields in request", () => {
+    const req = {
+        body: {
+            description: "No eventId or file", // Missing `eventId` and `file`
+        },
+    };
+
+    const res = {
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn(),
+    };
+
+    const attachmentController = require("./controllers/attachmentController");
+    attachmentController.addAttachment(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(400); // Expect HTTP 400 for bad request
+    expect(res.json).toHaveBeenCalledWith({
+        message: "Manjka datoteka ali ID dogodka",
+    });
+});
+
+
+// test 3
+test("getAttachmentsByEvent - should return attachments for an event", () => {
+    const req = { params: { eventId: 1 } };
+    const res = {
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn(),
+    };
+
+    const mockAttachments = [
+        { id: 1, event_id: 1, description: "Attachment 1", file_name: "file1.txt" },
+        { id: 2, event_id: 1, description: "Attachment 2", file_name: "file2.txt" },
+    ];
+
+    db.all.mockImplementation((sql, params, callback) => {
+        callback(null, mockAttachments); // Simulate successful query
+    });
+
+    attachmentController.getAttachmentsByEvent(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.json).toHaveBeenCalledWith(mockAttachments);
+});
+
+//test 4
+test("getAttachmentsByEvent - should fail with 400 if event ID is missing", () => {
+    const req = { params: {} }; // Missing eventId
+    const res = {
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn(),
+    };
+
+    attachmentController.getAttachmentsByEvent(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.json).toHaveBeenCalledWith({
+        message: "Event ID is required",
+    });
+});
+
+//test 5
+test("addAttachment - should fail with 400 if file or eventId is missing", () => {
+    const req = { body: { eventId: null }, file: null }; // Missing file and eventId
+    const res = {
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn(),
+    };
+
+    attachmentController.addAttachment(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.json).toHaveBeenCalledWith({
+        message: "Manjka datoteka ali ID dogodka",
+    });
+});
+
 

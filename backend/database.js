@@ -65,6 +65,22 @@ const db = new sqlite3.Database("./database.sqlite", (err) => {
             }
         });
 
+        // Create the 'attachments' table for storing event attachments
+        db.run(`
+            CREATE TABLE IF NOT EXISTS attachments (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                event_id INTEGER NOT NULL,
+                file_name TEXT NOT NULL,
+                file_data BLOB NOT NULL,
+                description TEXT,
+                FOREIGN KEY (event_id) REFERENCES events(id)
+            );
+        `, (err) => {
+            if (err) {
+                console.log("Error creating 'attachments' table:", err.message);
+            }
+        });
+
 
     }
 });
