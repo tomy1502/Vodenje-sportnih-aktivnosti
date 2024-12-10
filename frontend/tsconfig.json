@@ -3,5 +3,17 @@
   "references": [
     { "path": "./tsconfig.app.json" },
     { "path": "./tsconfig.node.json" }
-  ]
+  ],
+
+  "compilerOptions": {
+    "baseUrl": "./",
+    "paths": {
+      "*": ["src/*"]  // Map everything to the `src` folder
+    }
+  },
+  "include": ["src/**/*"], // Ensure all files in `src` are included
+  "exclude": ["node_modules"]
+
 }
+
+
