@@ -4,9 +4,9 @@ import Events from "./views/Events";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./index.css";
 import Profile from "./views/Profile/Profile";
-import AttachmentPage from "./views/AttachmentPage";
 import { signedInUserAtom } from "./atoms/signedInUserAtom";
 import { UserRole } from "./services/usersApi";
+import AttachmentPage from "./views/AttachmentPage.tsx";
 
 const App = () => {
     const [signedInUser] = useAtom(signedInUserAtom); // Get the currently signed-in user
