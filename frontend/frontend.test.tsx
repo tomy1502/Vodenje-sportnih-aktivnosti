@@ -70,7 +70,6 @@ describe('EventFilter Component', () => {
         // Simulate applying a filter
         fireEvent.change(screen.getByLabelText('Keywords'), { target: { value: 'conference' } });
 
-        // Check the updated computed color
         const updatedColor = getComputedStyle(clearButton).color;
         expect(updatedColor).toBe('rgb(13, 110, 253)'); // Equivalent of #0d6efd (blue)
     });
